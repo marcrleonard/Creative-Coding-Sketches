@@ -1,49 +1,36 @@
-int revolutions = 1;
 int radius = 300;
-float n_amount = .15;
-float n = .01;
-float noise_size = 30;
+float n_amount = .05;
+float amplitude = 20;
 
-float first_x;
-float first_y;
-
-float sides = 200.0;
+// if this value is too low, you see the `CLOSE` connection
+float resolution = 600.0;
 
 void setup() {
   size(700, 700);
   background(255);
   pixelDensity(2);
-  frameRate(2);
+  frameRate(24);
 };
 
 void draw() {
   background(255);
   translate(width/2, height/2);
-  
-  float angle = 360 / sides;
+
+  float angle = 360 / resolution;
 
   beginShape();
-  for (int i = 0; i < sides* revolutions; i++) {
+  for (int i = 0; i <= resolution; i++) {
 
-    
-
-    float offset = map(noise(n), 0, 1, -1, 1) * noise_size;
-    n = n + n_amount;
+    //float offset = map(noise(n), 0, 1, 0, 1);
+    float offset = noise(n_amount, n_amount);
+    n_amount += (.001 * frameCount);
     println(offset);
-  
-    
-    // crazy mandala circle...
-    //float x = cos(i) * radius ;
-    //float y = sin(i) *radius ;
-    
-    // crazy noiseyt circle
-    //float x = cos(radians(i + offset)) * radius;
-    //float y = sin(radians(i - offset)) * radius;
-    
-    
-    float x = cos(radians(i * angle)) * radius;
-    float y = sin(radians(i * angle)) * radius;
-    
+
+    float x = cos(radians(i * angle)) * radius * offset;
+    float y = sin(radians(i * angle)) * radius * offset;
+    //println(x, y);
+
+
     vertex(x, y);
   }
   endShape(CLOSE);
