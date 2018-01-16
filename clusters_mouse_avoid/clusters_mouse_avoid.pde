@@ -1,4 +1,4 @@
-int amt_obj = 100;
+int amt_obj = 300;
 Cluster c = new Cluster();
 Cluster[] cluster_list = new Cluster[amt_obj];
 

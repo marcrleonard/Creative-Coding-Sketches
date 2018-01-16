@@ -57,15 +57,22 @@ class Cluster { //<>//
 
     float xoff = 0;
     float yoff = 0;
+
     float x;
     float y;
+
+    //float p_x = x;
+    //float p_y = y;
+    //float x_reset = 0;
+    //float y_reset = 0;
+
     float inc = 0;
-    
+
     float o_dist = 20; // max distance from origin
 
     float sx = random(o_xe - o_dist, o_xe + o_dist);
     float sy = random(o_ye - o_dist, o_ye + o_dist);
-    
+
     float s_size = 1;
     float size = s_size;
     float size_max = 30;
@@ -76,19 +83,20 @@ class Cluster { //<>//
 
       float x_dist = mouseX-x;
       float y_dist = mouseY-y;
-      
+
       float avoid_distance = 50.0;
       float repel_speed = 10.0; // lower is faster
-      
+
       // if there is mouse disruption...
       if (x_dist >= -avoid_distance && x_dist <= avoid_distance) {
         if (y_dist >= -avoid_distance && y_dist <= avoid_distance) {
           sy = sy - y_dist/repel_speed;
           sx = sx - x_dist/repel_speed;
+
+          //grow circles
           if (size < size_max) {
-            size = size * 1.1;
+            size = ((size_max - size)/100)+size ;
           }
-          
         }
       }
       // otherwise, check if size needs to be 'decayed'
@@ -96,14 +104,21 @@ class Cluster { //<>//
         if (size > s_size) {
           size = size - ((size - s_size )/60);
         }
+        
+        
+        //if (x dist from origin is greater than... ) {
+        //  if (y dist from origin is greater than...) {
+        //    // check if the nodes are far away...
+        //  }
+        //}
       }
 
 
       xoff = map(noise(t+inc), 0, 1, -1 * child_move_amnt, child_move_amnt);
       yoff = map(noise((t+20)+inc), 0, 1, -1 * child_move_amnt, child_move_amnt);
 
-      x = sx + xoff + o_xoff/child_pull;
-      y = sy + yoff + o_yoff/child_pull;
+      x = sx + xoff + o_xoff/child_pull; // + x_reset;
+      y = sy + yoff + o_yoff/child_pull; // + y_reset;
 
 
       line(o_xe, o_ye, x, y);

@@ -1,5 +1,5 @@
 class Catcher {
-  float x = random( width/2 - padding, width - padding);
+  float x = random( padding, width - padding);
   float y = random(0+ padding, height - padding);
   float t;
   float l_d = 0;
@@ -21,9 +21,9 @@ class Mover {
   float x = sx;
   float y = sy;
   float t;
-  float sspeed = random(.2, 1.3); // 5,8 was cooll for full screen...
+  float sspeed = random(2, 5); // 5,8 was cooll for full screen...
   float speed = sspeed;
-  
+    
   float push_through = random(1,1.05);
   void show() {
     inc();
@@ -44,5 +44,6 @@ class Mover {
 
 class CatcherStorage {
   float l_d;
+  float line_inc = .05;
   Mover mover_obj;
 }
