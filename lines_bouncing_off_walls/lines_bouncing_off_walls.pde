@@ -1,11 +1,12 @@
 ArrayList<Vehicle> particles; //<>//
-float particle_number = 200;
+float particle_number = 500;
 
 
 void setup() {
   size(1000, 700);
   background(255);
-  pixelDensity(2);
+  //pixelDensity(2);
+  //fullScreen();
 
 
   particles = new ArrayList<Vehicle>();
@@ -18,6 +19,7 @@ void setup() {
 
 
 void draw() {
+  println(frameRate);
   background(255);
 
 
