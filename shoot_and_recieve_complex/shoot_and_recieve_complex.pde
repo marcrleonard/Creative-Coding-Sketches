@@ -1,6 +1,6 @@
-float padding = 20.0;  //<>// //<>// //<>// //<>// //<>// //<>//
-int mover_amt = 60;
-int catcher_amt = 50;
+float padding = 20.0; //<>//
+int mover_amt = 600;
+int catcher_amt = 20;
 float max_distance = 250;
 
 ArrayList<Catcher> catchers = new ArrayList<Catcher>();
@@ -8,8 +8,8 @@ ArrayList<Mover> movers = new ArrayList<Mover>();
 
 
 void setup() {
-  //size(1280, 720, P2D);
-  fullScreen(P2D);
+  size(1280, 720, P2D);
+  //fullScreen(P2D);
   //smooth(8);
   background(255);
   pixelDensity(2);
@@ -57,7 +57,7 @@ void draw() {
           if (m == c.attached.get(i).mover_obj) {
             // if so, remove m from c.attached.
             new_item = false;
-            break; //<>//
+            break;
           }
         }
         if (new_item) {
@@ -65,21 +65,21 @@ void draw() {
           m_obj.mover_obj = m; // put the object in it
 
           c.attached.add(m_obj);  // add it to array
-          println(c.attached.size());
+          //println(c.attached.size());
         }
-      } else {
+      } 
+      else {
         for (int i = 0; i < c.attached.size(); i++) {
           // check if m is in c.attached already.
+
           if (m == c.attached.get(i).mover_obj) {
             // if so, remove m from c.attached.
-            c.attached.remove(i);
-            break;
+              c.attached.remove(i);
+              break;
+
+            
           }
         }
-      }
-
-      if ( distance > 180) {
-        //println("shrink!");
       }
     }
   }
@@ -101,6 +101,7 @@ void draw() {
       if (m.l_d + m.line_inc < 1) {
         //m.l_d_last = m.l_d; // store last distance
         m.l_d = m.l_d + m.line_inc;
+        m.grow = 1;
       } else {
         m.l_d = 1;
       }

@@ -43,6 +43,7 @@ class Mover {
 }
 
 class CatcherStorage {
+  int grow = 0; // 0 is nothing, 1 is growing line, 2 is shrinking line;
   float l_d;
   float line_inc = .05;
   Mover mover_obj;
