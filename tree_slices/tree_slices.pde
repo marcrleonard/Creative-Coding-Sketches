@@ -1,6 +1,6 @@
 float t = 0; //<>// //<>//
 float c_r = 25; // circle radius
-float distance = 9.0;
+float distance = 9;
 int rings = 50;
 float resolution = 400;
 float angle = 360/resolution;
@@ -36,6 +36,7 @@ void draw() {
   for (int r=1; r <= rings; r++) {
     noFill();
     beginShape();
+    float r_noise = random(3,8);
     for (int i = 0; i<resolution; i++) {
       
       float x_var = map(noise(s_vars+2), 0, 1, 0, 3);
@@ -47,8 +48,10 @@ void draw() {
       original_circle.get(i).xoff += x_var ;
       original_circle.get(i).yoff += y_var ;
       
-      float x = cos(radians(angle * i)) * ((c_r+r*distance) - original_circle.get(i).xoff);
-      float y = sin(radians(angle * i)) * ((c_r+r*distance) - original_circle.get(i).yoff);
+      
+      
+      float x = cos(radians(angle * i)) * (((c_r+r*distance)+r_noise) - original_circle.get(i).xoff);
+      float y = sin(radians(angle * i)) * (((c_r+r*distance)+r_noise) - original_circle.get(i).yoff);
       vertex(x, y);
       
       
