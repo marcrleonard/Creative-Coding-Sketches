@@ -1,9 +1,10 @@
 float padding = 20.0; //<>// //<>// //<>//
 int mover_amt = 200;
 int catcher_amt = 3;
-float min_distance = 500;
+float min_distance = 400;
 float max_distance = 800;
 float middle_thresh = (max_distance - min_distance)/2;
+
 
 int catcher_rows = 5;
 float row_padding;
@@ -126,8 +127,8 @@ void draw() {
             //c.attached.get(i).mover_obj.grow = 2;
           }
         }
-
-        //m.grow = 2; //<>//
+ //<>//
+        //m.grow = 2;
       }
     }
   }
