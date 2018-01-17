@@ -9,7 +9,10 @@ void setup() {
   size(900, 900, P2D);
   background(255);
   pixelDensity(2);
+  smooth(8);
   randomSeed(27);
+  //noiseDetail(200);
+  noiseSeed(4);
 }
 
 void draw() {
@@ -21,13 +24,13 @@ void draw() {
   float s_vars = 0;
   
   for (int i = 0; i<resolution; i++) {
-    float xoff = map(noise(200+t), 0, 1, 0, 10);
-    float yoff = map(noise(t), 0, 1, 0, 10);
+    float xoff = map(noise(20+t), 0, 1, 0, 15);
+    float yoff = map(noise(t), 0, 1, 0, 15);
     CV p = new CV();
     p.xoff = xoff;
     p.yoff = yoff;
     original_circle.add(p);
-    t = t + .09;
+    t = t + .002;
   }
 
   for (int r=1; r <= rings; r++) {
@@ -47,6 +50,8 @@ void draw() {
       float x = cos(radians(angle * i)) * ((c_r+r*distance) - original_circle.get(i).xoff);
       float y = sin(radians(angle * i)) * ((c_r+r*distance) - original_circle.get(i).yoff);
       vertex(x, y);
+      
+      
 
       //c_r = c_r + 5;
     }
