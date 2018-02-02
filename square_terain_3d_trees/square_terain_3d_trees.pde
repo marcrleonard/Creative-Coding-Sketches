@@ -67,6 +67,7 @@ float zoff = 2;
       
       if (show_tree == 2) {
         pushMatrix();
+        scale(.05);
         rotateX(radians(-90));
         image(photo, 0, 0);
         popMatrix();
