@@ -1,22 +1,26 @@
-//<>// //<>//
-import peasy.PeasyCam;
+import peasy.PeasyCam; //<>//
 
 float yoff = 0;
 
-float inc = .02;
+float inc = .01;
 PVector v;
 PVector a;
+
+int a_l = 20;
 
 float[] cp;
 
 PeasyCam cam;
 
-ArrayList<PVector> Locations = new ArrayList<PVector>();
+//ArrayList<PVector> Locations = new ArrayList<PVector>();
+ArrayList<Item> Locations = new ArrayList<Item>();
 
 
 PImage photo;
 
-
+int sq = 100;
+int xscl = int(width/sq);
+int yscl = int(height/sq);
 
 void setup() {
   size(1200, 800, P3D);
@@ -27,71 +31,89 @@ void setup() {
   pixelDensity(2);
 
   cam = new PeasyCam(this, 200);
-  cam.setWheelScale(.2);
-  
+  //cam.setWheelScale(.2);
+
   photo = loadImage("tree.png");
-}
-
-
-void draw() {
   
-  
-  
-  background(255);
-  stroke(0);
+  //float fov = PI/3.0;
+  //float cameraZ = (height/2.0) / tan(fov/2.0);
+  //perspective(fov, width/height, cameraZ/100.0, cameraZ*10.0);
 
-  translate(-width/2, -20, -1000);
-  rotateX(radians(65));
-
-  int sq = 200;
-  int xscl = width/sq;
-  int yscl = height/sq;
-
-  
-
-  //yoff += .08;
-float zoff = 2;
+  float zoff = 2;
   for (int y =0; y<sq; y++) {
     float xoff = 2;
     for (int x = 0; x<sq; x++) {
-      float nv = noise(xoff, yoff, zoff);
-      float cv = map(nv, 0, 1, 0, 255);
+      Item i = new Item();
 
-      float zval = map(nv, 0, 1, 0, 300);
-      
-      int show_tree = int(random(1,100));
-      
-      float no = 0;
-      pushMatrix();
-      translate(x*xscl + no, y*yscl + no, zval);
-      
-      if (show_tree == 2) {
-        pushMatrix();
-        scale(.05);
-        rotateX(radians(-90));
-        image(photo, 0, 0);
-        popMatrix();
+      float nv = noise(xoff, yoff, zoff);
+
+      float z_height = 300;
+
+      float z = map(nv, 0, 1, 0, z_height);
+      if (z > z_height * .5) {
+        int show_tree = int(random(1, 20));
+        if (show_tree == 2) {
+          i.i = true;
+        }
       }
-      
-      //noStroke();
-      fill(255, 255, 255);
-      //fill(cv, cv, cv);
-      //box(xscl/3, yscl/3, 10);
-      point(0, 0, 0);
-      popMatrix();
+
+      i.x = x;
+      i.y = y;
+      i.z = z;
+
+      Locations.add(i);
 
       xoff -= inc;
     }
 
-    zoff += inc;
+    yoff += inc;
   }
-  yoff += .006;
-  println(frameRate);
 }
 
-//void keyPressed() {
-//  if (key == 'q') {
-//    println("yo!");
-//    //cam.setState(CameraState state, long animationTimeInMillis);
-//  }
-//}
+
+void draw() {
+
+  background(255);
+
+  pushStyle();
+  strokeWeight(1);
+  stroke(255, 0, 0);
+  line(-a_l, 0, 0, a_l, 0, 0);
+  stroke(0, 255, 0);
+  line(0, -a_l, 0, 0, a_l, 0);
+  stroke(0, 0, 255);
+  line(0, 0, -a_l, 0, 0, a_l);
+  popStyle();
+
+
+  translate(0,150, -sq);
+  rotateX(radians(90));
+  //rotateY(frameCount);
+  beginShape(POINTS);
+  for (Item i : Locations) {
+    vertex(i.x, i.y, i.z);
+    
+  }
+  endShape();
+  
+  for (Item i : Locations) {
+    if (i.i) {
+      float image_scale = .006;
+      pushMatrix();
+      translate(i.x * xscl, i.y * yscl, i.z + photo.height*image_scale);
+      scale(image_scale);
+      rotateX(radians(270));
+      image(photo, 0, 0);
+      popMatrix();
+    }
+  }
+
+}
+
+class Item {
+  float x;
+  float y;
+  float z;
+
+  boolean i = false;
+}
