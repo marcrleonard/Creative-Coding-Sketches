@@ -1,0 +1,1 @@
+svgsort output_60_0000_original.svg output_60_0000_optimized.svg --pad-abs --pad=2500
