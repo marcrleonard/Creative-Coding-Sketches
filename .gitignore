@@ -71,3 +71,8 @@ output/*
 *.jpg
 *.svg
 *.png
+
+**/venv/
+**/.venv/
+.venv/
+venv/
