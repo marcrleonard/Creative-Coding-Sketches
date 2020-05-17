@@ -5,12 +5,15 @@ import random
 random.seed(100)
 import copy
 import time
+from MyCollection import *
+
+from tkinter import Tk, mainloop, Scale, HORIZONTAL
 
 a3_ratio = (1.0,1.468)
 
 #1920/1080
-window_w = 1200
-window_h = 800
+window_w = 1500
+window_h = 1000
 center_x = window_w/2
 center_y = window_h/2
 rad_inc = .07
@@ -40,102 +43,291 @@ Create a spiral 'wreath' ... and eventual the ends of the 'tentacals' do somethi
 
 '''
 
-def delta_coords(degrees, distance):
-	angle_radians = degrees * math.pi / 180
-	x = math.cos(angle_radians) * distance
-	y = math.sin(angle_radians) * distance
-	return x, y
+class TypeBase:
+	def __init__(self):
+		pass
+	def draw(self):
+		raise Exception('Should be implemented by derived class')
+
+
+class Lovers(TypeBase):
+	def __init__(self, start_angle, end_angle, additional_radius=0):
+		self.start_angle = start_angle
+		self.end_angle = end_angle
+		self.start_radius = random.randint(270,290) + additional_radius
+		self.end_radius = self.start_radius
+
+	def draw(self):
+
+		n_off = 10
+
+		noise_amplitude = 30
+
+		# r_f = random.random()
+		# n_speed = remap(r_f, (0, 1), (.010, .18))
+
+		n_speed = .039
+
+		opposite = []
+
+		curr_raidus = self.start_radius
+
+		no_fill()
+		begin_shape()
+		for d in range(self.start_angle, self.end_angle):
+			_noiseness = noise(0, n_off)
+			noiseness = remap(_noiseness, (0, 1), (-noise_amplitude, noise_amplitude))
+
+			wave_radius = 10
+			wave_distance = 12
+			angle_radians = d*wave_distance * math.pi / 180
+			wave_offset = math.cos(angle_radians) * wave_radius
+
+			final_distance = curr_raidus+wave_offset+noiseness
+			final_distance_inverse = curr_raidus-wave_offset-noiseness
+			d_x, d_y = delta_coords(d, final_distance)
+
+			x = center_x + d_x
+			y = center_y + d_y
+
+			vertex(x, y)
+
+			d_x, d_y = delta_coords(d, final_distance_inverse)
+			x = center_x + d_x
+			y = center_y + d_y
+			opposite.append((x,y))
+
+			n_off += n_speed
+
+			curr_raidus += .23
+
+		end_shape()
+
+		# this will not use a certain part of the 'begining' of the curves
+
+		start = len(opposite) - int(.91*len(opposite))
+		opposite = opposite[start:]
+
+		begin_shape()
+		for p in opposite:
+			x = p[0]
+			y=p[1]
+			vertex(x,y)
+		end_shape()
+
+
+
+class Mothers(TypeBase):
+	def __init__(self, start_angle, end_angle, additional_radius=0):
+		self.start_angle = start_angle
+		# end_angle = self.start_angle +409
+		self.end_angle = end_angle
+		self.start_radius = random.randint(330,390) + additional_radius
+		self.end_radius = self.start_radius
+
+	def draw(self):
+
+		n_off = 30
+
+
+		noise_amplitude = 100
+
+		n_speed = .009
+
+		curr_raidus = self.start_radius
+
+		no_fill()
+		begin_shape()
+		for d in range(self.start_angle, self.end_angle):
+			_noiseness = noise(0, n_off)
+			noiseness = remap(_noiseness, (0, 1), (-noise_amplitude, noise_amplitude))
+
+			final_distance = curr_raidus+noiseness
+			d_x, d_y = delta_coords(d, final_distance)
+
+			x = center_x + d_x
+			y = center_y + d_y
+
+			vertex(x, y)
+
+
+			n_off += n_speed
+
+			curr_raidus += .01
+
+		end_shape()
+
+
+class Growers(TypeBase):
+	def __init__(self, start_angle, end_angle, additional_radius=0):
+		self.start_angle = start_angle
+
+		if 300 > self.start_angle - end_angle:
+			end_angle = self.start_angle+300
+
+		self.end_angle = end_angle
+		self.start_radius = random.randint(150,210) + additional_radius
+		self.end_radius = self.start_radius
+
+	def draw(self):
+
+		n_off = 40
+		noise_amplitude = 40
+
+		n_speed = .1
+
+		curr_raidus = self.start_radius
+
+		no_fill()
+		begin_shape()
+		for d in range(self.start_angle, self.end_angle):
+			_total = self.end_angle - self.start_angle
+			_cur = d - self.start_angle
+
+			noise_usage = 1.0
+			thresh = .75*_total
+			if _cur > thresh:
+				p = (_cur - thresh)/(_total - thresh)
+				noise_usage = 1.0-p
+
+			_noiseness = noise(0, n_off)
+			noiseness = remap(_noiseness, (0, 1), (-noise_amplitude, noise_amplitude))
+
+			noiseness = noiseness  * noise_usage
+
+			final_distance = curr_raidus+noiseness
+			d_x, d_y = delta_coords(d, final_distance)
+
+			x = center_x + d_x
+			y = center_y + d_y
+
+			# curve_vertex(x,y)
+			vertex(x, y)
+
+
+			n_off += n_speed
+
+			curr_raidus += .4
+
+		end_shape()
+
+
+
 
 class MVector:
-	def __init__(self,x,y, d):
+	def __init__(self,x,y, d, noise_speed=None):
 		self.x = x
 		self.y = y
 		self.degrees = d
 		self.distance = 500
+		self.noise_speed = noise_speed
 
-	def next_coords(self):
+	def next_coords(self, dist):
 
-		d_x,d_y = delta_coords(self.degrees, self.distance)
+		d_x,d_y = delta_coords(self.degrees, dist)
 		x = d_x+self.x
 		y = d_y+self.y
 
 		return x, y
 
+	def draw_line(self):
+		n_off=10
+		for l in range(self.distance):
 
-def degrees_to_radians(d):
-	return d * math.pi / 180
+			_noiseness = noise(0, n_off)
+			noise_amplitude = 30
+			noiseness = remap(_noiseness,  (0,1), (-noise_amplitude, noise_amplitude))
+
+			n_x, n_y = self.next_coords(l)
+
+			n_x = n_x+noiseness
+
+			line((self.x, self.y),(n_x, n_y))
+			self.x = n_x
+			self.y = n_y
+
+			n_off+=self.noise_speed
 
 
 
+
+# class Tweaks:
+# 	def __init__(self):
+# 		pass
+#
+# 	def run(self):
+# 		self.master = Tk()
+# 		w = Scale(self.master, from_=0, to=200, orient=HORIZONTAL)
+# 		w.pack()
+# 		mainloop()
+#
+# import threading
+#
+# tt = Tweaks()
+# t = threading.Thread(target=tt.run)
+# t.start()
+#
 def setup():
 	size(window_w, window_h)
 	background(255)
 
 
 
-
-
 end_vectors = []
+
+
 
 def draw():
 
+	faves = [6, 11, 13, 29, 60, 62, 76, 85, 88, 92, 120, 133, 159, 165, 192]
+	faves = [6]
+	# faves = [n for n in range(120, 200, 1)]
 
-	#### SINGLE ONE
-	noise_seed(seed_num)
-	background(255)
-	no_fill()
-	ellipse_mode('RADIUS')
-	stroke_weight(1.2)
+	for seed in faves:
+
+		#### SINGLE ONE
+		noise_seed(seed)
+		background(255)
+		# ellipse_mode('RADIUS')
+		stroke_weight(1.2)
+
+		object_types = [
+			# class, loops, expand-ness
+			(Mothers, 3, 15),
+			(Lovers, 2, 6),
+			(Growers, 1, 0),
+		]
+
+		for class_type, revs, rad_expand in object_types:
+
+			for l in range(1, revs+1):
+
+				# print(class_type)
+
+				start_angle = random.randint(0,360)
+
+				end_angle = random.randint(180, 360) + start_angle
+				# end_angle_low = start_angle+300
+				# end_angle_high = start_angle + 320
+				# end_angle_pre = random.randint(end_angle_low,end_angle_high)
+				# end_angle = get_end_angle_in_bounds(end_angle_pre)
+				d = l*rad_expand
+
+				m = class_type(start_angle, end_angle, d)
+				m.draw()
+
+		svg_name = f'output_{seed}.svg'
+		save_svg(svg_name, window_w, window_h)
+		clean_svg(svg_name)
+		save(f'output_{seed}_.png')
+
+
+	no_loop()
+	# exit(1)
 
 
 
-	revs = 27
 
-	for r in range(revs):
-
-		n_off = 10
-		radius = random.randint(200,290)
-		noise_amplitude = random.randint(15, 29)
-		r_f = random.random()
-		n_speed = remap(r_f, (0,1), (.010, .18))
-
-		start_angle = random.randint(0, 360)
-
-		spiral_size = random.randint(360,450)
-
-		end_angle = start_angle+spiral_size
-
-		d_x, d_y = delta_coords(start_angle, radius)
-		s_x = center_x + d_x
-		s_y = center_y + d_y
-
-		for d in range(start_angle+1, end_angle):
-
-			_noiseness = noise(0, n_off)
-
-			noiseness = remap(_noiseness,  (0,1), (-noise_amplitude, noise_amplitude))
-
-			noise_dist = radius+noiseness
-			d_x, d_y = delta_coords(d, noise_dist)
-
-			e_x = center_x+d_x
-			e_y = center_y+d_y
-			line((s_x, s_y), (e_x,e_y))
-
-			s_x=e_x
-			s_y=e_y
-
-			n_off+=n_speed
-
-			radius +=.001
-
-		v = MVector(s_x, s_y, end_angle+90)
-		end_vectors.append(v)
-
-	#draw end vectors
-	for v in end_vectors:
-		n_x, n_y = v.next_coords()
-		line((v.x, v.y), (n_x, n_y))
 
 
 	# # circle((center_x, center_y), 50)
@@ -161,3 +353,5 @@ def draw():
 
 
 run()
+
+
