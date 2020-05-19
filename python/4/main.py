@@ -69,15 +69,15 @@ class Mothers(TypeBase):
 
 		curr_raidus = self.start_radius
 
-		x = None
-		y = None
-
+		last_x = None
+		last_y = None
 
 		no_fill()
 		begin_shape()
 		for d in range(self.start_angle, self.end_angle):
 			_noiseness = noise(0, n_off)
 			noiseness = remap(_noiseness, (0, 1), (-noise_amplitude, noise_amplitude))
+			# noiseness = 0
 
 			final_distance = curr_raidus+noiseness
 			d_x, d_y = delta_coords(d, final_distance)
@@ -85,20 +85,36 @@ class Mothers(TypeBase):
 			x = center_x + d_x
 			y = center_y + d_y
 
-			vertex(x, y)
+			last_x = x
+			last_y = y
 
+			vertex(x, y)
 
 			n_off += n_speed
 
-			curr_raidus += .01
+			curr_raidus += .02
+
+		# end_shape()
+		#
+		# begin_shape()
+
+		for p in range(30):
+			_noiseness = noise(0, n_off)
+			noiseness = remap(_noiseness, (0, 1), (-noise_amplitude, noise_amplitude))
+
+			noiseness = 0
+			final_distance = curr_raidus + noiseness
+			d_x, d_y = delta_coords(self.end_angle+90, final_distance)
+
+
+			x = last_x + d_x
+			y = last_y + d_y
+
+			vertex(x, y)
+
+			n_off += n_speed
 
 		end_shape()
-
-		m = MVector(x,y,self.end_angle)
-		return m
-
-
-
 
 class MVector:
 	def __init__(self,x,y, d, noise_speed=None):
@@ -158,26 +174,26 @@ def draw():
 	# ellipse_mode('RADIUS')
 	stroke_weight(1.2)
 
-	for n in range(50):
+	for n in range(1):
 		s_a = random.randint(0,360)
-		_e_a = random.randint(360, 900)
+		_e_a = random.randint(360, 540)
 		e_a = get_end_angle_in_bounds(_e_a, low_bounds=25, high_bounds=80) + 270
 
 		m = Mothers(s_a, e_a)
-		ev = m.draw()
-		end_vectors.append(ev)
-
-	for v in end_vectors:
-
-		last_degrees = v.degrees
-		distance = 400
-
-		d_x, d_y = delta_coords(last_degrees+90, distance)
-
-		e_x = v.x+d_x
-		e_y = v.y+d_y
-
-		line((v.x, v.y),(e_x, e_y) )
+		m.draw()
+	# 	end_vectors.append(ev)
+	#
+	# for v in end_vectors:
+	#
+	# 	last_degrees = v.degrees
+	# 	distance = 400
+	#
+	# 	d_x, d_y = delta_coords(last_degrees+90, distance)
+	#
+	# 	e_x = v.x+d_x
+	# 	e_y = v.y+d_y
+	#
+	# 	line((v.x, v.y),(e_x, e_y) )
 
 	svg_name = f'output_{seed}.svg'
 	# save_svg(svg_name, window_w, window_h)
